@@ -38,7 +38,7 @@ def send_message(bot, message):
     except Exception as error:
         logging.error(f"Сообщение не отправлено!: {error}")
     else:
-        logging.debug(f"Сообщение отправлено")
+        logging.debug("Сообщение отправлено")
 
 
 def get_api_answer(timestamp):
@@ -110,7 +110,7 @@ def main():
             else:
                 logging.info(message)
 
-        except NotForSend as error:
+        except Exception as error:
             message = f"Сбой в работе программы: {error}"
             logging.error(message)
 

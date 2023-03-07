@@ -9,8 +9,3 @@ class ConnectionError(Exception):
 
     pass
 
-
-class NotForSend(Exception):
-    """Не для пересылки в телеграм."""
-
-    pass
