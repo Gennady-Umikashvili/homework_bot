@@ -27,7 +27,7 @@ HOMEWORK_VERDICTS = {
     "rejected": "Работа проверена: у ревьюера есть замечания.",
 }
 
-FIRST_STATUS_REQUEST_LAST_5_SECONDS = 5
+FIRST_STATUS_REQUEST_LAST_SECONDS = 5
 
 
 def check_tokens():
@@ -56,12 +56,14 @@ def get_api_answer(timestamp):
         homework_status = requests.get(**params_request)
     except requests.exceptions.RequestException as error:
         raise RequestAPIError(f"Ошибка при запросе к основному API: {error}")
-    except JSONDecodeError as error:
-        raise JSONError(f"Ошибка при декодировании JSON: {error}")
 
     if homework_status.status_code != HTTPStatus.OK:
         raise requests.HTTPError("Статус страницы != 200 ")
-    return homework_status.json()
+    try:
+        homework_json = homework_status.json()
+    except JSONDecodeError as error:
+        raise JSONError(f"Ошибка при декодировании JSON: {error}")
+    return homework_json
 
 
 def check_response(response):
@@ -96,7 +98,7 @@ def main():
         logging.critical(message)
         sys.exit(message)
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
-    timestamp = int(time.time()) - FIRST_STATUS_REQUEST_LAST_5_SECONDS
+    timestamp = int(time.time()) - FIRST_STATUS_REQUEST_LAST_SECONDS
     previous_message = ""
 
     while True:
@@ -111,7 +113,9 @@ def main():
             logging.error(message)
             if message != previous_message:
                 send_message(bot, message)
-                previous_message = ""
+                previous_message = message
+            else:
+                logging.info(message)
         finally:
             time.sleep(RETRY_PERIOD)
 
