@@ -107,6 +107,7 @@ def main():
             homeworks = check_response(response)
             if homeworks:
                 send_message(bot, parse_status(homeworks[0]))
+                previous_message = ""
             timestamp = response.get("current_date", int(time.time()))
         except Exception as error:
             message = f"Сбой в работе программы: {error}"
@@ -114,8 +115,6 @@ def main():
             if message != previous_message:
                 send_message(bot, message)
                 previous_message = message
-            else:
-                logging.info(message)
         finally:
             time.sleep(RETRY_PERIOD)
 
